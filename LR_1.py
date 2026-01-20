@@ -39,6 +39,8 @@ def cost_fxn(x,y,w,b):
 def gradient_descent(x,y,w_in,b_in,alpha,num_iters):
     w_in=0
     b_in=0
+    J_history = []
+    p_history = []
     m = x.shape[0]
     for i in range(num_iters):
         dj_dw = 0
@@ -51,8 +53,27 @@ def gradient_descent(x,y,w_in,b_in,alpha,num_iters):
         dj_db = dj_db / m
         w_in = w_in - alpha * dj_dw
         b_in = b_in - alpha * dj_db
-    return w_in,b_in
+             # Save cost J at each iteration
+        if i<100000:      # prevent resource exhaustion 
+            J_history.append(cost_fxn(x, y, w_in , b_in))
+            p_history.append([w_in,b_in])
+        # Print cost every at intervals 10 times or as many iterations if < 10
+        if i% math.ceil(num_iters/10) == 0:
+            print(f"Iteration {i:4}: Cost {J_history[-1]:0.2e} ",
+                  f"dj_dw: {dj_dw: 0.3e}, dj_db: {dj_db: 0.3e}  ",
+                  f"w: {w: 0.3e}, b:{b: 0.5e}")
+    return w_in,b_in,J_history, p_history
 
+# initialize parameters
+w_init = 0
+b_init = 0
+# some gradient descent settings
+iterations = 10000
+tmp_alpha = 1.0e-2
+# run gradient descent
+w_final, b_final, J_hist, p_hist = gradient_descent(x ,y, w_init, b_init, tmp_alpha, 
+                                                    iterations,)
+print(f"(w,b) found by gradient descent: ({w_final:8.4f},{b_final:8.4f})")
 tmp_f = lr_algo(x,w,b)
 plt.plot(x,tmp_f,label='Prediction')    
 plt.scatter(x,y,marker='x',color='red',label="Training Data")
